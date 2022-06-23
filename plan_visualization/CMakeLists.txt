@@ -1,30 +1,20 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(spacial_horizon)
+project(plan_visualization)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++14)
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -Wall")
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
+find_package(Eigen3 REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
+  roscpp
+  sensor_msgs
   geometry_msgs
   nav_msgs
-  roscpp
-  rospy
   std_msgs
-  visualization_msgs
-  tf
-  actionlib
 )
-find_package(Eigen3 REQUIRED)
-find_package(PCL 1.7 REQUIRED)
-
-# this is important to find eigen path
-set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -83,7 +73,7 @@ set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   geometry_msgs#   nav_msgs#   sensor_msgs#   std_msgs
 # )
 
 ################################################
@@ -117,8 +107,8 @@ set(Eigen3_INCLUDE_DIRS ${EIGEN3_INCLUDE_DIR})
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
   INCLUDE_DIRS include
-#  LIBRARIES spacial_horizon
-  CATKIN_DEPENDS visualization_msgs geometry_msgs nav_msgs roscpp rospy std_msgs tf actionlib
+  LIBRARIES plan_visualization
+  CATKIN_DEPENDS sensor_msgs geometry_msgs nav_msgs std_msgs roscpp 
 #  DEPENDS system_lib
 )
 
@@ -131,23 +121,14 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
-  ${Eigen3_INCLUDE_DIRS} 
-  ${PCL_INCLUDE_DIRS}
-)
-
-add_executable(spacial_horizon_node
-    src/spacial_horizon_node.cpp
-  )
-
-target_link_libraries(spacial_horizon_node
-  ${catkin_LIBRARIES}
-  ${PCL_LIBRARIES}
+  
+  ${EIGEN3_INCLUDE_DIR}
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/spacial_horizon.cpp
-# )
+add_library(plan_visualization
+ src/planning_visualization.cpp
+)
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -157,7 +138,7 @@ target_link_libraries(spacial_horizon_node
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/spacial_horizon_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/plan_visualization_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -170,9 +151,9 @@ target_link_libraries(spacial_horizon_node
 # add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(${PROJECT_NAME}_node
-#   ${catkin_LIBRARIES}
-# )
+target_link_libraries(plan_visualization
+  ${catkin_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -221,7 +202,7 @@ target_link_libraries(spacial_horizon_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_spacial_horizon.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_plan_visualization.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
