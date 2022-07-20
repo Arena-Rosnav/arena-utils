@@ -53,10 +53,9 @@ class sensor:
         for t_list in topics:
             for t in t_list:
                 if "/debug/model/obs_" in t:
-                    print(t)
                     self.obst_topics.append(t)
         self.update_obstacle_odom()
-        print("obstacles:", len(self.obst_topics))
+        # print("obstacles:", len(self.obst_topics))
 
     def pub_odom(self, event):
         self.update_cluster = False
