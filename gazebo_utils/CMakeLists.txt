@@ -77,7 +77,7 @@ add_dependencies(AttachModelPlugin  ${catkin_EXPORTED_TARGETS})
 
 catkin_install_python(PROGRAMS
   scripts/odom.py
-  scripts/trans.py
   scripts/generate_world.py
+  scripts/emergency_brake_node.py
    DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
