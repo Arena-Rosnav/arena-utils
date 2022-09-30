@@ -15,10 +15,6 @@ import tf2_ros
 import tf.transformations
 import numpy as np
 
-# TODO: More general robot name ?
-# TODO: See if other robots have different base frame names
-# if so, we have to use the name as param
-
 if __name__ == "__main__":
     rospy.init_node("odom_pub")
     base_frame = rospy.get_param("~base_frame", "base_link")
