@@ -22,7 +22,7 @@ sim_setup_path = rospack.get_path("arena-simulation-setup")
 
 # setting paths
 if not debug:
-    mode = rospy.get_param("~task_mode", "staged")
+    mode = rospy.get_param("task_mode", "random")
     world_name = rospy.get_param("~world")
     world_file = (
         sim_setup_path + "/worlds/" + world_name + "/worlds/" + world_name + ".world"
@@ -162,7 +162,7 @@ if mode in ["scenario", "scenario_staged"]:
 
     # loading scenario data
     if not debug:
-        scenario_path = rospy.get_param("~scenario_path")
+        scenario_path = rospy.get_param("/task_generator_node/scenario_json_path")
     else:
         scenario_path = "/home/elias/catkin_ws/src/arena-rosnav-3D/simulator_setup/scenarios/turtlebot3_world.json"
     scenario = ArenaScenario()
@@ -208,7 +208,7 @@ else:
 
     for item in range(num_of_actors):
         actor = Element("actor", name="person_" + str(item + 1))
-        s_pos = etree.fromstring("<pose> -0.46 20.8 0.0 0.0 0.0 1.18 </pose>")
+        s_pos = etree.fromstring("<pose> -0.46 20.8 -10.0 0.0 0.0 1.18 </pose>")
         actor.append(s_pos)
         skin = Element("skin")
         skin_fn = Element("filename")
