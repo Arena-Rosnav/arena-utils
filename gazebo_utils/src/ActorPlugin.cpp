@@ -33,7 +33,7 @@ namespace gazebo
         return;
       }
       rosNode.reset(new ros::NodeHandle(this->actor->GetName()));
-      rosNode->getParam("/actor_height", this->actor_height);
+      this->actor_height = 1.1;
       ros::SubscribeOptions so = ros::SubscribeOptions::create<pedsim_msgs::AgentStates>("/pedsim_simulator/simulated_agents", 1, boost::bind(&ActorPosePlugin::OnRosMsg, this, _1), ros::VoidPtr(), &rosQueue);
       rosSub = rosNode->subscribe(so);
       rosQueueThread = std::thread(std::bind(&ActorPosePlugin::QueueThread, this));
@@ -44,10 +44,12 @@ namespace gazebo
     void OnRosMsg(const pedsim_msgs::AgentStatesConstPtr msg)
     {
       double distanceTraveled;
+      bool actorFound = false;
       for (uint actor = 0; actor < msg->agent_states.size(); actor++)
       {
         if (this->actor->GetName() == "person_" + std::to_string(msg->agent_states[actor].id))
         {
+          actorFound = true;
           ignition::math::Pose3d pose = this->actor->WorldPose();
           ignition::math::Pose3d gzb_pose;
           // Getting the direction angle of the agent
@@ -65,7 +67,7 @@ namespace gazebo
                                 pose.Pos())
                                    .Length();
             this->actor->SetWorldPose(gzb_pose, true, false);
-            this->actor->SetScriptTime(this->actor->ScriptTime() + (distanceTraveled * 5.1)); //5.1 == Animation factor
+            this->actor->SetScriptTime(this->actor->ScriptTime() + (distanceTraveled * 5.1)); // 5.1 == Animation factor
             return;
           }
           catch (gazebo::common::Exception gz_ex)
@@ -73,6 +75,13 @@ namespace gazebo
             gzerr << "Problem\n";
           }
         }
+      }
+      if (!actorFound)
+      // Actor not found in pedsim simulation -> place him far away in Gazebo so it doesn't intervene
+      {
+        ignition::math::Pose3d pose = this->actor->WorldPose();
+        pose.Pos().Z() = -20.0;
+        this->actor->SetWorldPose(pose, true, false);
       }
     }
 
