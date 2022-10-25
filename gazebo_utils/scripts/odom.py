@@ -14,30 +14,54 @@ from geometry_msgs.msg import PoseWithCovariance, TwistWithCovariance, Transform
 import tf2_ros
 import tf.transformations
 import numpy as np
+import argparse
+import os
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    
+    parser.add_argument("robot_namespace")
+
+    return parser.parse_known_args()[0]
+
 
 if __name__ == "__main__":
     rospy.init_node("odom_pub")
-    base_frame = rospy.get_param("~base_frame", "base_link")
+
+    args = parse_args()
+
+    print(args)
+
+    namespace = args.robot_namespace
+    odom_frame = namespace.replace("/", "") + "_odom"
+    base_frame = namespace.replace("/", "") + "_base_footprint"
+
     rate = rospy.Rate(50)  # ROS Rate at 50Hz
-    pub = rospy.Publisher("/odom", Odometry, queue_size=10)
+    pub = rospy.Publisher(os.path.join(namespace, "odom"), Odometry, queue_size=10)
+
     rospy.wait_for_service("/gazebo/get_model_state")
     caller = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
+
     br = tf2_ros.TransformBroadcaster()
     model = rospy.get_param("/model", "jackal")
+    
     while not rospy.is_shutdown():
         # First param is the name of the robot in Gazebo
-        resp = caller(model, "world")
+        resp = caller(namespace, "world")
+
         now = rospy.get_rostime()
         msg = Odometry()
+        
         t = TransformStamped()
         t.header.stamp = now
-        t.header.frame_id = "odom"
+        t.header.frame_id = odom_frame
         t.child_frame_id = base_frame
         t.transform.translation = resp.pose.position
         t.transform.rotation = resp.pose.orientation
         br.sendTransform(t)
         msg.header.stamp = now
-        msg.header.frame_id = "odom"
+        msg.header.frame_id = odom_frame
         msg.child_frame_id = base_frame
         msg.pose.pose = resp.pose
 

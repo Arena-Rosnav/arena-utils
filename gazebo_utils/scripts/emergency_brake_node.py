@@ -1,6 +1,8 @@
 #! /usr/bin/env python3
+from urllib import parse
 import numpy as np
 import rospy
+import argparse
 from geometry_msgs.msg import Pose, PoseStamped, PoseWithCovarianceStamped, Twist
 from sensor_msgs.msg import LaserScan
 
@@ -10,8 +12,15 @@ and slows down, makes a full stop accordingly.
 """
 
 
-class emergency_node:
-    def __init__(self):
+def parse_args():
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument("robot_namespace")
+
+    return parser.parse_known_args()[0]
+
+class EmergencyBrakeNode:
+    def __init__(self, namespace):
         """
         __init__ [The node expects the commanded velocity to be published on /nav_vel, then redirects to /cmd_vel]
 
@@ -58,14 +67,12 @@ class emergency_node:
         self.cmd_vel_pub.publish(data)
 
 
-def main():
-    rospy.init_node("emergency-break", anonymous=True)
-    node = emergency_node()
-    rospy.spin()
-
-
 if __name__ == "__main__":
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+    rospy.init_node("emergency_break_node", anonymous=True)
+
+    args = parse_args()
+
+    node = EmergencyBrakeNode(args.robot_namespace)
+    
+    while not rospy.is_shutdown():
+        rospy.spin()
