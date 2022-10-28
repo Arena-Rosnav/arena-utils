@@ -3,7 +3,6 @@ import rospkg
 import os
 import traceback
 import yaml
-import random
 from std_srvs.srv import Empty, EmptyResponse
 from std_msgs.msg import ColorRGBA
 from nav_msgs.msg import Odometry

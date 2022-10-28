@@ -1,6 +1,6 @@
 class Config:
     MAP = {
-        "Alpha": 0.7,
+        "Alpha": 0.3,
         "Class": "rviz/Map",
         "Color Scheme": "map",
         "Draw Behind": "true",
@@ -21,7 +21,7 @@ class Config:
         "Marker Alpha": 1,
         "Marker Scale": 1,
         "Name": "Transform",
-        "Show Arrows": True,
+        "Show Arrows": False,
         "Show Axes": True,
         "Show Names": True,
         "Update Interval": 0,
