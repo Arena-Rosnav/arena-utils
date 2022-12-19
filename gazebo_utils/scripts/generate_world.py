@@ -34,7 +34,8 @@ else:
 
 
 # extract data
-tree_ = etree.parse(world_file)
+parser = etree.XMLParser(remove_blank_text=True)
+tree_ = etree.parse(world_file, parser)
 world_ = tree_.getroot().getchildren()[0]
 
 # removing old actor elements from .world file, before creating new ones
