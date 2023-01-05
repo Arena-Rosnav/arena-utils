@@ -30,12 +30,13 @@ if __name__ == "__main__":
     rospy.init_node("odom_pub")
 
     args = parse_args()
-
-    print(args)
-
     namespace = args.robot_namespace
-    odom_frame = namespace.replace("/", "") + "_odom"
-    base_frame = namespace.replace("/", "") + "_base_footprint"
+    odom_frame = "odom"
+    base_frame = rospy.get_param("robot_base_frame", "base_link")
+    
+    if namespace != "":
+        odom_frame = namespace.replace("/", "") + "/odom"
+        base_frame = namespace.replace("/", "") + f"/{base_frame}"
 
     rate = rospy.Rate(50)  # ROS Rate at 50Hz
     pub = rospy.Publisher(os.path.join(namespace, "odom"), Odometry, queue_size=10)
@@ -44,7 +45,6 @@ if __name__ == "__main__":
     caller = rospy.ServiceProxy("/gazebo/get_model_state", GetModelState)
 
     br = tf2_ros.TransformBroadcaster()
-    model = rospy.get_param("/model", "jackal")
     
     while not rospy.is_shutdown():
         # First param is the name of the robot in Gazebo

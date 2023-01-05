@@ -1,20 +1,17 @@
 #!/usr/bin/env python3
-from visualization_msgs.msg import MarkerArray
-import rosnode
-import rospy
-
-from nav_msgs.msg import Odometry
-from geometry_msgs.msg import Point, Vector3
-from std_msgs.msg import ColorRGBA
-from ford_msgs.msg import Clusters
-
 import copy
 
-from std_msgs.msg import Int16
+import pedsim_msgs.msg as peds
+import rosnode
+import rospy
+from ford_msgs.msg import Clusters
+from geometry_msgs.msg import Point, Vector3
+from nav_msgs.msg import Odometry
 
 # col
 from scenario_police import police
-import pedsim_msgs.msg as peds
+from std_msgs.msg import ColorRGBA, Int16
+from visualization_msgs.msg import MarkerArray
 
 
 class sensor:
@@ -82,29 +79,41 @@ class sensor:
     def cb_marker(self, msg, topic=None):
 
         if self.update_cluster:
+
             if type(msg) == MarkerArray:
                 v = Vector3()
                 m = msg.markers[0]
                 pos = m.pose.position
                 r = m.scale.x / 2
                 label = 0
-
                 if topic in self.obstacles:
                     old_pos = self.obstacles[topic][0]
                     old_time = self.obstacles[topic][3].nsecs
                     curr_time = m.header.stamp.nsecs
-                    dt = (curr_time - old_time) * 10 ** -9
+                    dt = (curr_time - old_time) * 10**-9
                     if dt > 0:
                         v.x = round((pos.x - old_pos.x) / dt, 3)
                         v.y = round((pos.y - old_pos.y) / dt, 3)
                     label = len(self.obst_topics)
                 self.obstacles[topic] = [pos, r, v, m.header.stamp, label]
+            else:  # Process pedsim agents
+                for agent in msg.agent_states:
+                    v = agent.twist.linear
+                    pos = agent.pose.position
+                    label = agent.id
+                    self.obstacles[label] = [
+                        pos,
+                        0.35,
+                        v,
+                        agent.header.stamp,
+                        label + len(self.obst_topics),
+                    ]
 
 
 def run():
     rospy.init_node("tb3_sensor_sim", anonymous=False)
     sensor()
-    police()
+    # police()
     rospy.spin()
 
 
