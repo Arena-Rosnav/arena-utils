@@ -103,9 +103,15 @@ bool SpacialHorizon::getSubgoal(Eigen::Vector2d &subgoal)
 
 void SpacialHorizon::updateSubgoalCallback(const ros::TimerEvent &e)
 {
-    if (!has_goal)
+    std::cout << "GEN NEW SUBGOAL" << std::endl;
+
+
+    if (!has_goal) {
+    std::cout << "NO GOAL" << std::endl;
+
         return;
 
+    }
     Eigen::Vector2d subgoal;
     bool subgoal_success = getSubgoal(subgoal);
     ;
@@ -123,6 +129,8 @@ void SpacialHorizon::updateSubgoalCallback(const ros::TimerEvent &e)
 
     if (!subgoal_success)
     {
+    std::cout << "SUBGOAL SUCCESS" << std::endl;
+        
         return;
     }
 
@@ -132,6 +140,9 @@ void SpacialHorizon::updateSubgoalCallback(const ros::TimerEvent &e)
     pose_stamped.pose.position.x = subgoal(0);
     pose_stamped.pose.position.y = subgoal(1);
     pose_stamped.pose.position.z = 0.0;
+
+    std::cout << "PUBLISHING SUBGOAL" << std::endl;
+
     pub_subgoal.publish(pose_stamped);
 }
 

@@ -25,6 +25,8 @@ class VisualizeRobotModel:
     def start_model_visualization_callback(self, _):
         robot_names = rospy.get_param("robot_names", [])
 
+        robot_odom_topic = VisualizeRobotModel.get_complexity_odom_topic()
+
         for name in robot_names:
             robot_model = rospy.get_param(os.path.join(name, "robot_model"))
 
@@ -44,7 +46,7 @@ class VisualizeRobotModel:
 
             self.subscribers.append(
                 rospy.Subscriber(
-                    os.path.join(name, "odom"), 
+                    os.path.join(name, robot_odom_topic), 
                     Odometry, 
                     self.publish_model,
                     (robot_model, name)
@@ -126,6 +128,16 @@ class VisualizeRobotModel:
         marker.points.append(marker.points[0])
 
         return marker
+
+    @staticmethod
+    def get_complexity_odom_topic():
+        complexity = rospy.get_param("complexity", 1)
+
+        if complexity == 1:
+            return "odom"
+        if complexity == 2:
+            return "odom_amcl"
+
 
 if __name__ == "__main__":
     rospy.init_node("visualize_robot_model")
