@@ -28,7 +28,7 @@ class ConfigFileGenerator:
 
         published_topics, _ = rostopic.get_topic_list()
 
-        published_topics = np.array(published_topics).transpose()[0]
+        published_topics = [topic_info[0] for topic_info in published_topics]
 
         robot_names = rospy.get_param("robot_names", [])
 
